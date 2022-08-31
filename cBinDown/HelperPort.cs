@@ -25,7 +25,10 @@ namespace cBinDown
         }
         public static string GetProcessCurrentLen()
         {
-            return devData.uCurrenLen.ToString();
+            double val = 0;
+            if (devData.uTotalLen > 0)
+                val = (double)(100.0 * devData.uCurrenLen / devData.uTotalLen);
+            return val.ToString("f1")+"%%";
         }
         public static string GetOpStep()
         {
@@ -196,8 +199,16 @@ namespace cBinDown
             {
                 //芯片读保护
                 await FunReadUnProtect();
-
-                startDat=await FunREADCMD(0x08000000, 4);
+                await Task.Delay(200);
+                result = sPort.ReadBase(new byte[] { 0x7F });
+                m = 3;
+                while ((!result.IsSuccess) && (m > 0))
+                {
+                    await Task.Delay(50);
+                    result = sPort.ReadBase(new byte[] { 0x7F });
+                    m--;
+                }
+                startDat =await FunREADCMD(0x08000000, 4);
                 if(startDat==null||startDat[0]!=0xff)
                 {
                     devData.strStep = "擦除失败";

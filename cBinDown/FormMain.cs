@@ -24,7 +24,12 @@ namespace cBinDown
         {
             string s = comboBoxPort.Text;
             if (string.IsNullOrWhiteSpace(s)) return;
-            HelperPort.PortOpen(s);
+            try
+            {
+                HelperPort.PortOpen(s);
+            }
+            catch { }
+            
             comboBoxPort.Enabled=!HelperPort.PortIsOpen();
         }
         private void buttonClosePort_Click(object sender, EventArgs e)
@@ -59,7 +64,8 @@ namespace cBinDown
             comboBoxPort.Items.Clear();
             foreach(string s in values)
             {
-                comboBoxPort.Items.Add(s);
+                if(!comboBoxPort.Items.Contains(s))
+                    comboBoxPort.Items.Add(s);
             }
         }
 
